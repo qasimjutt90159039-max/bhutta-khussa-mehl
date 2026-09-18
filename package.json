@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Bhutta Khussa Mehal — Full MERN Stack E-Commerce Store",
   "scripts": {
+    "build": "node build.js",
+    "build:client": "node build.js",
     "server": "npm --prefix server start",
     "client": "npm --prefix client start",
     "dev:server": "npm --prefix server run dev",
-    "seed": "npm --prefix server run seed",
-    "build:client": "npm --prefix client run build"
+    "seed": "npm --prefix server run seed"
   },
   "keywords": [
     "mern",
