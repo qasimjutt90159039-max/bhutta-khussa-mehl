@@ -1,0 +1,19 @@
+import axios from "axios";
+
+// In production, set REACT_APP_API_URL in Vercel's frontend project env vars
+// to point to your deployed backend, e.g. https://bhutta-khussa-mehal-api.vercel.app/api
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("bkm_admin_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
