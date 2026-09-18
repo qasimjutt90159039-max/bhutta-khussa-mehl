@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../api/api";
 import ProductCard from "../components/ProductCard";
+import { fallbackProducts } from "../data/fallbackProducts";
 
 const categories = [
   { id: "All", label: "All Catalog" },
@@ -72,10 +73,45 @@ const Shop = () => {
       params.minPrice = 5001;
     }
 
+    const filterLocal = (list) => {
+      let result = [...list];
+      if (category && category !== "All") {
+        result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+      }
+      if (search) {
+        const q = search.toLowerCase();
+        result = result.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            p.description.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q)
+        );
+      }
+      if (priceFilter === "under3500") {
+        result = result.filter((p) => p.price < 3500);
+      } else if (priceFilter === "3500to5000") {
+        result = result.filter((p) => p.price >= 3500 && p.price <= 5000);
+      } else if (priceFilter === "above5000") {
+        result = result.filter((p) => p.price > 5000);
+      }
+      if (sort === "price_asc") {
+        result.sort((a, b) => a.price - b.price);
+      } else if (sort === "price_desc") {
+        result.sort((a, b) => b.price - a.price);
+      }
+      return result;
+    };
+
     api
       .get("/products", { params })
-      .then(({ data }) => setProducts(data.products))
-      .catch(() => setProducts([]))
+      .then(({ data }) => {
+        if (data?.products?.length > 0) {
+          setProducts(data.products);
+        } else {
+          setProducts(filterLocal(fallbackProducts));
+        }
+      })
+      .catch(() => setProducts(filterLocal(fallbackProducts)))
       .finally(() => setLoading(false));
   }, [category, sort, search, priceFilter]);
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/api";
 import { useCart } from "../context/CartContext";
 import ProductCard from "../components/ProductCard";
+import { fallbackProducts } from "../data/fallbackProducts";
 
 const placeholderImg =
   "data:image/svg+xml;utf8," +
@@ -59,7 +60,21 @@ const ProductDetail = () => {
           })
           .catch(() => {});
       })
-      .catch(() => setError("Product not found."))
+      .catch(() => {
+        const local = fallbackProducts.find((p) => p.slug === slug || p._id === slug);
+        if (local) {
+          setProduct(local);
+          setSize(local.sizes?.[0] ?? null);
+          setColor(local.colors?.[0] ?? null);
+          setRelatedProducts(
+            fallbackProducts
+              .filter((p) => p.category === local.category && p._id !== local._id)
+              .slice(0, 4)
+          );
+        } else {
+          setError("Product not found.");
+        }
+      })
       .finally(() => setLoading(false));
   }, [slug]);
 

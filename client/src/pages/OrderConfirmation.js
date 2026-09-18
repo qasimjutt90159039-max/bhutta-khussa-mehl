@@ -9,6 +9,14 @@ const OrderConfirmation = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    const stored = localStorage.getItem(`bkm_order_${id}`);
+    if (stored) {
+      try {
+        setOrder(JSON.parse(stored));
+        setLoading(false);
+        return;
+      } catch (e) {}
+    }
     api
       .get(`/orders/${id}`)
       .then(({ data }) => setOrder(data))

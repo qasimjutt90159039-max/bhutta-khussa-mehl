@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/api";
 import ProductCard from "../components/ProductCard";
+import { fallbackProducts } from "../data/fallbackProducts";
 
 const collections = [
   {
@@ -98,8 +99,16 @@ const Home = () => {
   useEffect(() => {
     api
       .get("/products", { params: { limit: 12 } })
-      .then(({ data }) => setFeatured(data.products))
-      .catch(() => setFeatured([]))
+      .then(({ data }) => {
+        if (data?.products?.length > 0) {
+          setFeatured(data.products);
+        } else {
+          setFeatured(fallbackProducts.slice(0, 12));
+        }
+      })
+      .catch(() => {
+        setFeatured(fallbackProducts.slice(0, 12));
+      })
       .finally(() => setLoading(false));
   }, []);
 
